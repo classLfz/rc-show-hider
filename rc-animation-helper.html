@@ -1,0 +1,148 @@
+<script type="text/javascript">
+(function() {
+  'use strict';
+
+  var fade = {
+    target: function(node) {
+      var animationConfig =  {
+        'show': [
+          {
+            name: 'fade-in-animation',
+            node: node
+          }
+        ],
+        'hide': [
+          {
+            name: 'fade-out-animation',
+            node: node
+          }
+        ]
+      };
+
+      return {
+        animationConfig: animationConfig
+      };
+    }
+  };
+
+  var ripple = {
+    opener: function(node) {
+      var animationConfig =  {
+        'hide': [
+          {
+            name: 'ripple-animation',
+            id: 'ripple',
+            fromPage: node
+          }
+        ],
+        'show': [
+          {
+            name: 'reverse-ripple-animation',
+            id: 'reverse-ripple',
+            toPage: node
+          }
+        ],
+      };
+
+      var sharedElements = {
+        'ripple': node,
+        'reverse-ripple': node
+      };
+
+      return {
+        animationConfig: animationConfig,
+        sharedElements: sharedElements
+      };
+    },
+    target: function(node) {
+      var animationConfig =  {
+        'show': [
+          {
+            name: 'ripple-animation',
+            id: 'ripple',
+            toPage: node
+          },
+          {
+            name: 'fade-in-animation',
+            node: node.$.container
+          }
+        ],
+        'hide': [
+          {
+            name: 'fade-out-animation',
+            node: node.$.container,
+          },
+          {
+            name: 'reverse-ripple-animation',
+            id: 'reverse-ripple',
+            fromPage: node
+          }
+        ]
+      };
+
+      var sharedElements = {
+        'ripple': node.$.placeholder,
+        'reverse-ripple': node.$.placeholder
+      };
+
+      return {
+        animationConfig: animationConfig,
+        sharedElements: sharedElements
+      };
+    }
+  };
+
+  var animations = {
+    ripple: ripple,
+    fade: fade
+  };
+
+  window.RcAnimationHelper = {
+    animations: animations,
+    mixinOpenerConfig: function(node, name) {
+      this.mixinConfigByRole(node, name, 'opener');
+    },
+    mixinTargetConfig: function(node, name) {
+      this.mixinConfigByRole(node, name, 'target');
+    },
+    // 将动画设置mixin至node里
+    mixinConfigByRole: function(node, name, role) {
+      var animation = animations[name];
+      if (!animation) {
+        return false;
+      }
+
+      var config = animation[role](node);
+      if (!config) {
+        return false;
+      }
+
+      var animationConfig = config.animationConfig;
+      if(animationConfig) {
+        mixinConfig(node, animationConfig, 'animationConfig');
+      }
+
+      var sharedElements = config.sharedElements;
+      if(sharedElements) {
+        mixinConfig(node, sharedElements, 'sharedElements');
+      }
+
+      return true;
+    }
+
+  };
+
+  function mixinConfig(node, configObj, configName) {
+    // 注意sharedAnimatable是默认使用同一个（所有继承的都是）object，
+    // 所以必需使用新的object来覆盖
+    var nodeConfig = node[configName];
+    node[configName] = configObj;
+
+    for (var key in nodeConfig) {
+      // if (!configObj[key]) {
+        configObj[key] =  nodeConfig[key];
+      // }
+    }
+  }
+})();
+</script>

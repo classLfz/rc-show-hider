@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>rc-show-hider Demo</title>
+    <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="./a-elm.html">
+    <link rel="import" href="../rc-show-hider.html">
+    <link rel="import" href="../rc-animation-wraper.html">
+    <link rel="import" href="../../paper-button/paper-button.html">
+    <style>
+      .blue #placeholder {
+        background-color: blue;
+        cursor: pointer;
+      }
+
+      .green #placeholder {
+        background-color: green;
+      }
+
+      rc-show-hider#b {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 500px;
+        width: 500px;
+        overflow: hidden;
+      }
+
+      #example2 {
+        position: relative;
+      }
+    </style>
+  </head>
+  <body unresolved>
+
+    <h2>Simple Animation(Non Shared) </h2>
+
+    <div>
+      <button id="showBtn" type="button" name="button">Show me a hero!</button>
+      <button id="hideBtn" type="button" name="button">Go Hide!</button>
+    </div>
+
+    <div>
+      <rc-show-hider id="a">
+        <a-elm class="iner green"></a-elm>
+      </rc-show-hider>
+    </div>
+
+    <h2>"Shared" Animation </h2>
+
+    <div id="example2">
+      <rc-animation-wraper id="wraperA">
+        <paper-button id="showBtnS" class="iner" raised>Show me a hero!</paper-button>
+      </rc-animation-wraper>
+      <rc-show-hider id="b" animation-name="ripple">
+        <a-elm class="iner blue"></a-elm>
+      </rc-show-hider>
+    </div>
+
+    <script>
+      var showHider = document.querySelector('rc-show-hider#a');
+      var showHiderB = document.querySelector('rc-show-hider#b');
+
+      document.querySelector('#showBtn').addEventListener('click', function() {
+        showHider.show();
+      });
+
+      document.querySelector('#hideBtn').addEventListener('click', function() {
+        showHider.hide();
+      });
+
+      var showBtnS = document.querySelector('#showBtnS');
+      var wraperA = document.querySelector('#wraperA');
+      showBtnS.addEventListener('click', function() {
+        showHiderB.outer = wraperA;
+        showHiderB.show();
+      });
+
+      var elmBlue = document.querySelector('a-elm.blue');
+      elmBlue.addEventListener('click', function() {
+        showHiderB.hide();
+      });
+
+      // document.addEventListener("rc-show-hider-lasers", function(e) {
+      //   console.log(e.detail.sound);
+      // });
+
+    </script>
+
+  </body>
+</html>

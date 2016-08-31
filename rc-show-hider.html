@@ -1,0 +1,178 @@
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="../neon-animation/neon-animations.html">
+
+<link rel="import" href="./rc-animation-helper.html">
+
+<!--
+"rc-show-hider"提供一个有show()和hide()方法的容器，同时包含一些基本的动画.
+
+Example:
+
+    <rc-show-hider id="myShowHider">
+      <div class="iner">
+        Some Contents.
+      </div>
+    </rc-show-hider>
+
+显示showHider:
+
+    this.$.myShowHider.show();
+
+隐藏showHider:
+
+    this.$.myShowHider.hide();
+
+@demo demo/index.html
+-->
+
+
+<dom-module id="rc-show-hider">
+  <template>
+    <style>
+      :host {
+      }
+
+      :host:not([showed]):not(.rc-animating) {
+        display: none;
+      }
+    </style>
+
+    <content id="iner" select=".iner"></content>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+    var helper = window.RcAnimationHelper;
+
+    Polymer({
+      is: 'rc-show-hider',
+      behaviors: [
+        Polymer.NeonAnimationRunnerBehavior
+      ],
+      properties: {
+        /**
+         * 动画名称。
+         */
+        animationName: {
+          type: String,
+          value: 'fade'
+        },
+
+        /**
+         * 外部的动画元素。用于shared element类型的动画。必须是一个NeonSharedElementAnimatableBehavior。
+         *
+         * @type NeonSharedElementAnimatableBehavior
+         */
+        outer: {
+          type: Object,
+          notify: true,
+          observer: '_outerChanged',
+          value: function() {
+            return null;
+          }
+        },
+
+        iner: {
+          type: Object,
+          notify: true,
+          observer: '_inerChanged'
+        },
+
+        /**
+         * 当前元素的show状态。可通过更改其触发show()和hide()。
+         */
+        showed: {
+          type: Boolean,
+          notify: true,
+          observer: '_showedChanged',
+          reflectToAttribute: true
+        }
+      },
+      listeners: {
+        'neon-animation-finish': '_onNeonAnimationFinish'
+      },
+      attached: function() {
+        this.iner = this.getContentChildren('#iner')[0];
+      },
+
+      /**
+       * 显示元素，并执行对应动画。
+       */
+      show: function() {
+        this.showed = true;
+      },
+
+      /**
+       * 隐藏元素，并执行对应动画。
+       */
+      hide: function() {
+        this.showed = false;
+      },
+
+      _showedChanged: function() {
+        var iner = this.iner;
+        var outer = this.outer;
+
+        if (this.showed) {
+          this._play(outer, iner);
+
+          this.fire('show', null, {
+            bubbles: false
+          });
+          return;
+        }
+
+        this._play(iner, outer);
+        this.fire('hide', null, {
+          bubbles: false
+        });
+      },
+      _onNeonAnimationFinish: function() {
+        this.classList.remove('rc-animating');
+      },
+
+      // 监听iner和outer的改变，将动画设置放入其内
+      _inerChanged: function() {
+        if (this.iner) {
+          helper.mixinTargetConfig(this.iner, this.animationName);
+        }
+      },
+      _outerChanged: function() {
+        if (this.outer) {
+          helper.mixinOpenerConfig(this.outer, this.animationName);
+        }
+      },
+      _play: function(fromPage, toPage) {
+        this.classList.add('rc-animating');
+
+        // this.animationConfig = [{
+        //   name: 'opaque-animation',
+        //   node: toPage
+        // }];
+        this.animationConfig = [];
+
+        if (toPage) {
+          this.animationConfig.push({
+            animatable: toPage,
+            type: 'show'
+          });
+        }
+
+        if (fromPage) {
+          this.animationConfig.push({
+            animatable: fromPage,
+            type: 'hide'
+          });
+        }
+
+        this.playAnimation(null, {
+          fromPage: fromPage,
+          toPage: toPage
+        });
+      }
+    });
+  })();
+  </script>
+</dom-module>

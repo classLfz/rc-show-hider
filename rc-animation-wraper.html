@@ -1,0 +1,57 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="../neon-animation/neon-shared-element-animatable-behavior.html">
+<link rel="import" href="../neon-animation/neon-animations.html">
+
+
+<!--
+"rc-show-hider"提供一个有show()和hide()方法的容器，同时包含一些基本的动画.
+
+Example:
+
+    <rc-show-hider id="myShowHider">
+      <div class="iner">
+        Some Contents.
+      </div>
+    </rc-show-hider>
+
+显示showHider:
+
+    this.$.myShowHider.show();
+
+隐藏showHider:
+
+    this.$.myShowHider.hide();
+
+@demo demo/index.html
+-->
+
+
+<dom-module id="rc-animation-wraper">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+      }
+
+    </style>
+
+    <content id="iner" select=".iner"></content>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'rc-animation-wraper',
+      behaviors: [Polymer.NeonSharedElementAnimatableBehavior],
+      properties: {
+
+      },
+      attached: function() {
+        // this.iner = this.getContentChildren('#iner')[0];
+      }
+    });
+  })();
+  </script>
+</dom-module>
